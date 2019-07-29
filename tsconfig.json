@@ -10,7 +10,7 @@
     "lib": ["es2017", "dom"],
     "mapRoot": "./src",
     "sourceMap": true,
-    "types": ["jest", "node", "jasmine", "core-js"],
+    "types": ["jest", "node", "core-js"],
     "typeRoots": ["../node_modules/@types", "src/types"],
 
     /* Additional Checks */

@@ -37,7 +37,6 @@
   "dependencies": {},
   "devDependencies": {
     "@types/core-js": "^2.5.0",
-    "@types/jasmine": "^2.8.9",
     "@types/jest": "^23.3.14",
     "@types/node": "^10.12.2",
     "benchmark": "^2.1.4",

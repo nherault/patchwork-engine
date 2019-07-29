@@ -3,8 +3,7 @@ const webpack = require('webpack');
 
 module.exports = {
     entry: {
-        'math': path.join(__dirname, '/src/math/index.ts'),
-        'utils': path.join(__dirname, '/src/utils/index.ts')
+        'engine': path.join(__dirname, '/src/engine/index.ts')
     },
     output: {
         path: path.resolve(__dirname, '_bundles'),

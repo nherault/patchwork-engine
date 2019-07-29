@@ -1,3 +1,7 @@
 !dist
 src
 coverage
+
+_bundles
+lib
+lib-es6
