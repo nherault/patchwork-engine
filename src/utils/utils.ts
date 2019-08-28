@@ -2,26 +2,17 @@ export const logErr = (value: any) => process.env.NODE_ENV !== 'production' ? co
 export const logWarn = (value: any) => process.env.NODE_ENV !== 'production' ? console.warn(value) : undefined;
 export const logDebug = (value: any) => process.env.NODE_ENV !== 'production' ? console.debug(value) : undefined;
 
-export const featureFlag = (flag: boolean, featureFn: Function) => flag ? featureFn() : undefined;
-
-export const addKeyValue = (obj: any, key: string, value: any, overrideAll = true) => {
-  if (overrideAll) {
-    obj[key] = {
-      ...obj[key],
-      ...value,
-    };
-  } else {
-
-  }
-}
+export const featureFlag = (flag: boolean, featureFn: () => void) => flag ? featureFn() : undefined;
+export const computeOrDefault = (value: any, computeFunction: (value: any) => any, defaultValue?: any): any =>
+  value === undefined ? defaultValue : computeFunction(value);
 
 /**
  * Deep Copy all the properties from the sources to the target
  * @param target
- * @param source 
+ * @param source
  * @param resetArray
  */
-export function deepCopy(destination:any, sources:any|any[], resetArray = false): any {
+export function deepCopy(destination: any, sources: any | any[], resetArray = false): any {
   const sourcesToCopyFrom: any[] = sources.constructor === Array ? sources : [sources];
   sourcesToCopyFrom.forEach(source => {
     destination = internalDeepCopy(destination, source, resetArray);
@@ -45,7 +36,7 @@ function internalDeepCopy(target: any, source: any, resetArray: boolean): any {
   return target;
 }
 
-function copyFromObject(target: any|undefined, source: any, resetArray: boolean): any {
+function copyFromObject(target: any | undefined, source: any, resetArray: boolean): any {
   if (target === undefined) {
     target = {};
   }

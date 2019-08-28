@@ -1,5 +1,6 @@
-import { ConfigBuilder, PatchworkEngine } from '../engine';
-import { basePlugin } from './plugins/base-plugin';
+import { ConfigBuilder, ConfigResult, PatchworkEngine } from '../engine';
+import { logDebug } from '../utils/utils';
+import { BASE_ACTION_CREATOR, BASE_GETTER_CREATOR, basePlugin, BasePluginParameterTypes } from './plugins/base-plugin';
 const body: HTMLCollectionOf<HTMLElementTagNameMap['body']> = document.getElementsByTagName('body');
 
 const initConfig = new ConfigBuilder()
@@ -8,20 +9,32 @@ const initConfig = new ConfigBuilder()
   .addPlugin({
     name: 'overrideParam',
     parameters: { param1: 'newParam1' },
+    required: {
+      actions: ['badAction'],
+      getters: ['badGetter'],
+      plugins: { badPlugin: '1.0.0' },
+      services: ['badService'],
+    },
     version: '0.0.1',
-  }, { param2: 'newParam2' })
-  .getConfig();
+  }, { param2: 'newParam2', param1: 'newParam1Bis' })
+  .log()
+  .getConfig((configResult: ConfigResult) => {
+    logDebug(configResult);
+  });
 
+logDebug(initConfig);
 const patchworkEngine = new PatchworkEngine(initConfig);
 patchworkEngine.init();
 
-patchworkEngine.dispatch('action1', { code: 'code', label: 'label' });
-patchworkEngine.dispatch('action2', { code: 'code', label: 'label' });
-const codeLabel = patchworkEngine.get('formatCodeLabel', { code: 'code', label: 'label' });
-console.debug(patchworkEngine.get('getService1Entities'));
-console.debug(patchworkEngine.get('getService2Entities'));
-const param1 = patchworkEngine.getParamater('param1');
-const param2 = patchworkEngine.getParamater('param2');
-const param3 = patchworkEngine.getParamater('param3');
-const param4 = patchworkEngine.getParamater('param4.subParam1.code');
+patchworkEngine.dispatch(BASE_ACTION_CREATOR.BASE_ACTION1({ code: 'code', label: 'label' }));
+patchworkEngine.dispatch(BASE_ACTION_CREATOR.BASE_ACTION2({ code: 'code', label: 'label' }));
+patchworkEngine.dispatch(BASE_ACTION_CREATOR.BASE_ACTION3());
+patchworkEngine.dispatch(BASE_ACTION_CREATOR.BASE_ACTION4());
+const codeLabel = patchworkEngine.get(BASE_GETTER_CREATOR.BASE_FORMAT_CODE_LABEL({ code: 'code', label: 'label' }));
+console.debug(patchworkEngine.get(BASE_GETTER_CREATOR.BASE_GET_SERVICE1_ENTITIES()));
+console.debug(patchworkEngine.get(BASE_GETTER_CREATOR.BASE_GET_SERVICE2_ENTITIES()));
+const param1 = patchworkEngine.getParameter(BasePluginParameterTypes.PARAM_1);
+const param2 = patchworkEngine.getParameter(BasePluginParameterTypes.PARAM_2);
+const param3 = patchworkEngine.getParameter(BasePluginParameterTypes.PARAM_3);
+const param4 = patchworkEngine.getParameter(BasePluginParameterTypes.PARAM_4).subParam1.code;
 body[0].innerText = `${codeLabel} | ${param1} | ${param2} | ${JSON.stringify(param3)} | ${param4}`;

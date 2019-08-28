@@ -2,7 +2,8 @@
   "name": "patchwork-engine",
   "version": "0.0.1",
   "description": "Patchwork Engine",
-  "main": "lib-es6/index.js",
+  "main": "lib-es6/index",
+  "typings": "lib-es6/index",
   "scripts": {
     "prepare": "npm run build",
     "clean": "shx rm -rf _bundles lib lib-es6",
