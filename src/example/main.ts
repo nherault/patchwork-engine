@@ -1,6 +1,6 @@
 import { ConfigBuilder, ConfigResult, PatchworkEngine } from '../engine';
 import { logDebug } from '../utils/utils';
-import { BASE_ACTION_CREATOR, BASE_GETTER_CREATOR, basePlugin, BasePluginParameterTypes } from './plugins/base-plugin';
+import { baseActionInfo, baseGetterInfo, basePlugin, BasePluginParameterTypes } from './plugins/base-plugin';
 const body: HTMLCollectionOf<HTMLElementTagNameMap['body']> = document.getElementsByTagName('body');
 
 const initConfig = new ConfigBuilder()
@@ -26,13 +26,15 @@ logDebug(initConfig);
 const patchworkEngine = new PatchworkEngine(initConfig);
 patchworkEngine.init();
 
-patchworkEngine.dispatch(BASE_ACTION_CREATOR.BASE_ACTION1({ code: 'code', label: 'label' }));
-patchworkEngine.dispatch(BASE_ACTION_CREATOR.BASE_ACTION2({ code: 'code', label: 'label' }));
-patchworkEngine.dispatch(BASE_ACTION_CREATOR.BASE_ACTION3());
-patchworkEngine.dispatch(BASE_ACTION_CREATOR.BASE_ACTION4());
-const codeLabel = patchworkEngine.get(BASE_GETTER_CREATOR.BASE_FORMAT_CODE_LABEL({ code: 'code', label: 'label' }));
-console.debug(patchworkEngine.get(BASE_GETTER_CREATOR.BASE_GET_SERVICE1_ENTITIES()));
-console.debug(patchworkEngine.get(BASE_GETTER_CREATOR.BASE_GET_SERVICE2_ENTITIES()));
+const { create: createAction } = baseActionInfo;
+const { create: createGetter } = baseGetterInfo;
+patchworkEngine.dispatch(createAction.BASE_ACTION1({ code: 'code', label: 'label' }));
+patchworkEngine.dispatch(createAction.BASE_ACTION2());
+patchworkEngine.dispatch(createAction.BASE_ACTION3({ code: 'code', label: 'label' }));
+patchworkEngine.dispatch(createAction.BASE_ACTION4());
+const codeLabel = patchworkEngine.get(createGetter.BASE_FORMAT_CODE_LABEL({ code: 'code', label: 'label' }));
+console.debug(patchworkEngine.get(createGetter.BASE_GET_SERVICE1_ENTITIES()));
+console.debug(patchworkEngine.get(createGetter.BASE_GET_SERVICE2_ENTITIES()));
 const param1 = patchworkEngine.getParameter(BasePluginParameterTypes.PARAM_1);
 const param2 = patchworkEngine.getParameter(BasePluginParameterTypes.PARAM_2);
 const param3 = patchworkEngine.getParameter(BasePluginParameterTypes.PARAM_3);

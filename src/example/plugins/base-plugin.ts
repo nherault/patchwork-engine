@@ -1,19 +1,19 @@
-import { ActionReducer, PatchworkActionFunction, PluginConfig } from '../../engine/engine.type';
+import { ActionInits, ActionReducer, PatchworkActionFunction, PluginConfig } from '../../engine/engine.type';
 import { actions } from './actions';
 import { getters } from './getters';
 import { hooks } from './hooks';
 import { parameters } from './parameters';
-import { BasePluginServiceTypes, MyService, services } from './services';
+import { BasePluginServiceTypes, Entity, MyService, services } from './services';
 
 /////////////////////////////////
 // INITS
 /////////////////////////////////
 export interface BaseInitActionTypes {
-  BASE_INIT_MY_SERVICE_VALUE: any;
-  BASE_INIT_MY_SERVICES_VALUE: any;
+  BASE_INIT_MY_SERVICE_VALUE: { position: { x: number, y: number }};
+  BASE_INIT_MY_SERVICES_VALUE: Array<{ position: { x: number, y: number }}>;
 }
 
-const inits = [
+const inits: ActionInits<BaseInitActionTypes> = [
   { type: 'BASE_INIT_MY_SERVICE_VALUE', payload: { position: { x: 5, y: 2 } }},
   { type: 'BASE_INIT_MY_SERVICES_VALUE', payload: [
     { position: { x: 5, y: 2 } },
@@ -22,11 +22,11 @@ const inits = [
 ];
 
 const actionInits: ActionReducer<BaseInitActionTypes> = {
-  BASE_INIT_MY_SERVICE_VALUE: ({ getService }: PatchworkActionFunction, payload: any): void => {
+  BASE_INIT_MY_SERVICE_VALUE: ({ getService }: PatchworkActionFunction, payload: Entity): void => {
     const myService1: MyService = getService(BasePluginServiceTypes.MY_SERVICE_1);
     myService1.addEntity(payload);
   },
-  BASE_INIT_MY_SERVICES_VALUE: ({ getService }: PatchworkActionFunction, payload: any): void => {
+  BASE_INIT_MY_SERVICES_VALUE: ({ getService }: PatchworkActionFunction, payload: Entity[]): void => {
     const myService1: MyService = getService(BasePluginServiceTypes.MY_SERVICE_1);
     myService1.addEntities(payload);
   },

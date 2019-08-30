@@ -1,5 +1,3 @@
-import { createActionCreators } from './action-creator';
-
 export interface Action {
     type: string;
     payload?: any;
@@ -120,29 +118,53 @@ export interface PluginConfig {
     [key: string]: any;
 }
 
+export type ActionInits<A> = Array<{ type: keyof A, payload: A[keyof A]}>;
+
 export type Reducer<C, A> = {
-    [T in keyof A]: (config: C, payload: A[T]) => void;
+    [T in keyof A]: A[T] extends void ? (config: C) => void : (config: C, payload: A[T]) => void;
 };
 
-export type ActionReducer<A> = {
-    // [T in keyof A]: (config: PatchworkActionFunction, payload: If<Equals<A[T], void>, never, A[T]>) => void;
-    [T in keyof A]: (config: PatchworkActionFunction, payload: A[T] extends never ? never : A[T]) => void;
-    // [T in keyof A]: (config: PatchworkActionFunction, payload: A[T]) => void;
-    // [T in keyof A]: (config: PatchworkActionFunction, payload: A[T]) => void;
-};
-export type GetterReducer<A> = {
-    [T in keyof A]: (config: PatchworkGetterFunction, payload: A[T] extends never ? never : A[T]) => void;
-    // [T in keyof A]: (config: PatchworkGetterFunction, payload: If<Equals<A[T], void>, never, A[T]>) => void;
-    // [T in keyof A]: (config: PatchworkGetterFunction, payload: A[T]) => void;
+export type ActionReducer<A> = Reducer<PatchworkActionFunction, A>;
+export type GetterReducer<A> = Reducer<PatchworkGetterFunction, A>;
+
+type EngineActionCreator<A> = {
+    [T in keyof A]: A[T] extends void ? () => { type: T } : (payload: A[T]) => { type: T, payload: A[T]};
 };
 
-export type EngineAction<S extends string, P> = (
-    payload?: P,
-) => { type: S, payload?: P };
-
-export type EngineActionCreated<S extends string, P> = {
-    [T in S]: EngineAction<S, P>
+const create = <A, C>(reducer: Reducer<C, A>): EngineActionCreator<A> => {
+    const result: any = {};
+    for (const type in reducer) {
+        if (!reducer.hasOwnProperty(type)) {
+            continue;
+        }
+        result[type] = (payload: any) => ({ type, payload });
+    }
+    return result;
 };
 
-export const actionCreator = createActionCreators;
-export const getterCreator = createActionCreators;
+const createTypes = <C, A>(reducer: Reducer<C, A>): {[T in keyof A]: T} => {
+    const result: any = {};
+    for (const type in reducer) {
+        if (!reducer.hasOwnProperty(type)) {
+            continue;
+        }
+        result[type] = type;
+    }
+    return result;
+};
+
+const createInfo = <A, C>(reducer: Reducer<C, A>) => {
+    return {
+        types: createTypes(reducer),
+        create: create(reducer),
+    };
+};
+
+export const createActionType = createTypes;
+export const createGetterType = createTypes;
+
+export const createAction = create;
+export const createGetter = create;
+
+export const createActionInfo = createInfo;
+export const createGetterInfo = createInfo;

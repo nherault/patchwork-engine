@@ -1,19 +1,23 @@
+export interface Entity {
+    position: { x: number, y: number };
+}
+
 export class MyService {
-    private entities: any[];
+    private entities: Entity[];
     constructor() {
         console.debug('constructor: MyService');
         this.entities = [];
     }
 
-    public getEntities(): any[] {
+    public getEntities(): Entity[] {
         return this.entities;
     }
 
-    public addEntity(value: any) {
+    public addEntity(value: Entity) {
         this.entities.push(value);
     }
 
-    public addEntities(value: any[]) {
+    public addEntities(value: Entity[]) {
         this.entities = this.entities.concat(value);
     }
 }

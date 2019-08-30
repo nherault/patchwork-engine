@@ -1,33 +1,47 @@
-import { actionCreator, ActionReducer, PatchworkActionFunction } from '../../engine';
-import { BASE_GETTER_CREATOR } from './getters';
+import { ActionReducer, createActionInfo, PatchworkActionFunction } from '../../engine';
+import { baseGetterInfo } from './getters';
 import { BasePluginParameterTypes } from './parameters';
+
+const { create: createGetter } = baseGetterInfo;
 
 /////////////////////////////////
 // ACTIONS
 /////////////////////////////////
 
-export interface BaseActionTypes {
+interface BaseActionTypes1 {
   BASE_ACTION1: { code: string, label: string };
-  BASE_ACTION2: { code: string, label: string };
-  BASE_ACTION3: void;
+  BASE_ACTION2: void;
+}
+
+interface BaseActionTypes2 {
+  BASE_ACTION3: { code: string, label: string };
   BASE_ACTION4: void;
 }
 
-export const actions: ActionReducer<BaseActionTypes> = {
+const actions1: ActionReducer<BaseActionTypes1> = {
     BASE_ACTION1: ({}: PatchworkActionFunction, payload: { code: string, label: string }): void => {
       console.debug(`action1 called: ${JSON.stringify(payload)}`);
     },
-    BASE_ACTION2: ({ dispatch, get }: PatchworkActionFunction, payload: { code: string, label: string }): void => {
-      console.debug(`action2 called: ${JSON.stringify(payload)}`);
-      dispatch(BASE_ACTION_CREATOR.BASE_ACTION1({ code: 'action2', label: get(BASE_GETTER_CREATOR.BASE_FORMAT_CODE_LABEL(payload)) }));
-    },
-    BASE_ACTION3: ({ get, getParameter }: PatchworkActionFunction): void => {
-      console.debug(`action3 called: ${get(BASE_GETTER_CREATOR.BASE_FORMAT_CODE_LABEL(getParameter(BasePluginParameterTypes.PARAM_3)))}`);
-    },
-    BASE_ACTION4: ({ get, getParameter }: PatchworkActionFunction): void => {
-        const parameter = getParameter(BasePluginParameterTypes.PARAM_4).subParam1;
-        console.debug(`action4 called: ${get(BASE_GETTER_CREATOR.BASE_FORMAT_CODE_LABEL(parameter))}`);
+    BASE_ACTION2: ({ get, getParameter }: PatchworkActionFunction): void => {
+      console.debug(`action2 called: ${get(createGetter.BASE_FORMAT_CODE_LABEL(getParameter(BasePluginParameterTypes.PARAM_3)))}`);
     },
   };
 
-export const BASE_ACTION_CREATOR = actionCreator(actions);
+const actions2: ActionReducer<BaseActionTypes2> = {
+    BASE_ACTION3: ({}: PatchworkActionFunction, payload: { code: string, label: string }): void => {
+      console.debug(`action3 called: ${JSON.stringify(payload)}`);
+    },
+    BASE_ACTION4: ({ get, getParameter }: PatchworkActionFunction): void => {
+        const parameter = getParameter(BasePluginParameterTypes.PARAM_4).subParam1;
+        console.debug(`action4 called: ${get(createGetter.BASE_FORMAT_CODE_LABEL(parameter))}`);
+    },
+  };
+
+type BaseActionTypes = BaseActionTypes1 & BaseActionTypes2;
+
+export const actions: ActionReducer<BaseActionTypes> = {
+  ...actions1,
+  ...actions2,
+};
+
+export const baseActionInfo = createActionInfo(actions);
