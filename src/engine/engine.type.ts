@@ -1,23 +1,8 @@
-export interface Action {
-    type: string;
-    payload?: any;
-}
-
-export interface Getter {
-    type: string;
-    payload?: any;
-}
-
-export interface Actions {
-    [id: string]: (patchworkFunction: PatchworkActionFunction, payload: any | never) => void;
-}
-
-export interface Getters {
-    [id: string]: (patchworkFunction: PatchworkGetterFunction, payload?: any | never) => void;
-}
+import { Action, ActionReducer, PatchworkActionFunction } from './action.type';
+import { Getter, GetterReducer } from './getter.type';
 
 export interface Services {
-    [id: string]: Service;
+    [serviceName: string]: Service;
 }
 
 export interface Service {
@@ -34,22 +19,6 @@ export enum PatchworkConfigType {
     GETTERS = 'getters',
     SERVICES = 'services',
     PARAMETERS = 'parameters',
-}
-
-export interface PatchworkActionFunction {
-    dispatch: (action: Action) => void;
-    get: (getter: Getter) => any;
-    isExist: (type: PatchworkConfigType, id: string) => boolean;
-    getParameter: (key: string, otherConfig?: { parameters?: any }) => any;
-    getService: (serviceName: string) => any;
-    resetServices: () => void;
-}
-
-export interface PatchworkGetterFunction {
-    get: (getter: Getter) => any;
-    isExist: (type: PatchworkConfigType, id: string) => boolean;
-    getParameter: (key: string, otherConfig?: { parameters?: any }) => any;
-    getService: (serviceName: string) => any;
 }
 
 export const enum HookType {
@@ -72,13 +41,14 @@ export interface Hook {
 export interface ConfigResult {
     errors: string[];
     warnings: string[];
+    config: EngineConfig;
 }
 
 export interface EngineConfig {
     name: string;
     version: string;
-    actions: Actions;
-    getters: Getters;
+    actions: ActionReducer<any>;
+    getters: GetterReducer<any>;
     services: Services;
     parameters: { [key: string]: boolean | string | any[] | object };
     inits: Action[];
@@ -108,8 +78,8 @@ export interface PluginRequired {
 export interface PluginConfig {
     name: string;
     version: string;
-    actions?: Actions;
-    getters?: Getters;
+    actions?: ActionReducer<any>;
+    getters?: GetterReducer<any>;
     services?: Services;
     parameters?: { [key: string]: boolean | string | any[] | object };
     inits?: Action[];
@@ -118,53 +88,4 @@ export interface PluginConfig {
     [key: string]: any;
 }
 
-export type ActionInits<A> = Array<{ type: keyof A, payload: A[keyof A]}>;
-
-export type Reducer<C, A> = {
-    [T in keyof A]: A[T] extends void ? (config: C) => void : (config: C, payload: A[T]) => void;
-};
-
-export type ActionReducer<A> = Reducer<PatchworkActionFunction, A>;
-export type GetterReducer<A> = Reducer<PatchworkGetterFunction, A>;
-
-type EngineActionCreator<A> = {
-    [T in keyof A]: A[T] extends void ? () => { type: T } : (payload: A[T]) => { type: T, payload: A[T]};
-};
-
-const create = <A, C>(reducer: Reducer<C, A>): EngineActionCreator<A> => {
-    const result: any = {};
-    for (const type in reducer) {
-        if (!reducer.hasOwnProperty(type)) {
-            continue;
-        }
-        result[type] = (payload: any) => ({ type, payload });
-    }
-    return result;
-};
-
-const createTypes = <C, A>(reducer: Reducer<C, A>): {[T in keyof A]: T} => {
-    const result: any = {};
-    for (const type in reducer) {
-        if (!reducer.hasOwnProperty(type)) {
-            continue;
-        }
-        result[type] = type;
-    }
-    return result;
-};
-
-const createInfo = <A, C>(reducer: Reducer<C, A>) => {
-    return {
-        types: createTypes(reducer),
-        create: create(reducer),
-    };
-};
-
-export const createActionType = createTypes;
-export const createGetterType = createTypes;
-
-export const createAction = create;
-export const createGetter = create;
-
-export const createActionInfo = createInfo;
-export const createGetterInfo = createInfo;
+export type ActionInits = Action[];

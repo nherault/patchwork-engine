@@ -5,27 +5,27 @@ import { BasePluginServiceTypes, Entity } from './services';
 // GETTERS
 /////////////////////////////////
 
-interface BaseGetterTypes1 {
-    BASE_FORMAT_CODE_LABEL: { code: string, label: string };
-    BASE_GET_CODE: { code: string, label: string };
+export interface GetterTypes1 {
+    BASE_FORMAT_CODE_LABEL: [{ code: string, label: string }, string];
+    BASE_GET_CODE: [{ code: string, label: string }, string];
 }
 
-interface BaseGetterTypes2 {
-    BASE_GET_LABEL: { code: string, label: string };
-    BASE_GET_SERVICE1_ENTITIES: void;
-    BASE_GET_SERVICE2_ENTITIES: void;
-}
-
-const getters1: GetterReducer<BaseGetterTypes1> = {
+const getters1: GetterReducer<GetterTypes1> = {
     BASE_FORMAT_CODE_LABEL: ({ get }: PatchworkGetterFunction, payload: { code: string, label: string }): string => {
-        return `${get(createGetter.BASE_GET_CODE(payload))}: ${get(createGetter.BASE_GET_LABEL(payload))}`;
+        return `${createGetter.BASE_GET_CODE(get, payload)}: ${createGetter.BASE_GET_LABEL(get, payload)}`;
     },
     BASE_GET_CODE: ({}: PatchworkGetterFunction, payload: { code: string, label: string }): string => {
         return payload.code;
     },
 };
 
-const getters2: GetterReducer<BaseGetterTypes2> = {
+export interface GetterTypes2 {
+    BASE_GET_LABEL: [{ code: string, label: string }, string];
+    BASE_GET_SERVICE1_ENTITIES: [Entity[]];
+    BASE_GET_SERVICE2_ENTITIES: [Entity[]];
+}
+
+const getters2: GetterReducer<GetterTypes2> = {
     BASE_GET_LABEL: ({}: PatchworkGetterFunction, payload: { code: string, label: string }): string => {
         return payload.label;
     },
@@ -39,12 +39,12 @@ const getters2: GetterReducer<BaseGetterTypes2> = {
     },
 };
 
-type BaseGetterTypes = BaseGetterTypes1 & BaseGetterTypes2;
+type GetterTypes = GetterTypes1 & GetterTypes2;
 
-export const getters: GetterReducer<BaseGetterTypes> = {
+export const getters: GetterReducer<GetterTypes> = {
     ...getters1,
     ...getters2,
 };
 
 export const baseGetterInfo = createGetterInfo(getters);
-const { create: createGetter } = baseGetterInfo;
+const { gets: createGetter } = baseGetterInfo;

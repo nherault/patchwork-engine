@@ -15,3 +15,14 @@ ConfigBuilder
 Test:
 - Add JEST tests
 
+Required: Change signature
+- Generate Action
+- Generate Getter
+- Generate Service
+
+Parameter:
+- Add getParameter with type (like getters)
+
+Service:
+- Dependencie injection?
+- Initialisation?

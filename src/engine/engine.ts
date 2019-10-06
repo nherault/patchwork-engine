@@ -1,17 +1,20 @@
 import { logErr } from '../utils/utils';
-import { Action, EngineConfig, Getter, Hook, HookPosition, HookType, PatchworkConfigType } from './engine.type';
+import { Action } from './action.type';
+import { EngineConfig, Hook, HookPosition, HookType, PatchworkConfigType } from './engine.type';
+import { Getter } from './getter.type';
 
 // TODO:
 // - Hotload plugin (reset Service, initService / initAction)
 export class PatchworkEngine {
+  public readonly dispatchBind: any;
+  public readonly getBind: any;
+
   private config: EngineConfig;
 
-  private dispatchBind: any;
-  private getBind: any;
-  private isExistBind: any;
-  private getParameterBind: any;
-  private getServiceBind: any;
-  private resetServicesBind: any;
+  private readonly isExistBind: any;
+  private readonly getParameterBind: any;
+  private readonly getServiceBind: any;
+  private readonly resetServicesBind: any;
 
   constructor(config: any) {
     this.config = config;

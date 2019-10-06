@@ -1,5 +1,6 @@
 import { computeOrDefault, featureFlag, logDebug, logErr, logWarn } from '../utils/utils';
-import { Action, ConfigResult, EngineConfig, initialConfig, PluginConfig, PluginRequired } from './engine.type';
+import { Action } from './action.type';
+import { ConfigResult, EngineConfig, initialConfig, PluginConfig, PluginRequired } from './engine.type';
 
 export class ConfigBuilder {
     private config: EngineConfig;
@@ -48,9 +49,9 @@ export class ConfigBuilder {
         return this;
     }
 
-    public getConfig(callback?: (configResult: ConfigResult) => void): EngineConfig {
+    public build(callback?: (configResult: ConfigResult) => void): EngineConfig {
         computeOrDefault(callback, (safeCallback: (configResult: ConfigResult) => void) =>
-            safeCallback({errors: this.errors, warnings: this.warnings }));
+            safeCallback({errors: this.errors, warnings: this.warnings, config: this.config }));
         return this.config;
     }
 

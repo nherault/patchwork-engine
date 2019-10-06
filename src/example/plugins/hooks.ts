@@ -1,5 +1,4 @@
-import { Getter, HookPosition, HookType } from '../../engine';
-import { Action } from '../../engine/engine.type';
+import { Action, Getter, HookPosition, HookType } from '../../engine';
 
 /////////////////////////////////
 // HOOKS
