@@ -1,13 +1,13 @@
 import { computeOrDefault, featureFlag, logDebug, logErr, logWarn } from '../utils/utils';
 import { Action } from './action.type';
-import { ConfigResult, EngineConfig, initialConfig, PluginConfig, PluginRequired } from './engine.type';
+import { BuildConfig, ConfigResult, initialConfig, PluginConfig, PluginRequired } from './engine.type';
 
 export class ConfigBuilder {
-    private config: EngineConfig;
+    private config: BuildConfig;
     private errors: string[];
     private warnings: string[];
 
-    constructor(sourceConfig?: EngineConfig) {
+    constructor(sourceConfig?: BuildConfig) {
         this.config = sourceConfig ? sourceConfig : initialConfig;
         this.errors = [];
         this.warnings = [];
@@ -49,7 +49,7 @@ export class ConfigBuilder {
         return this;
     }
 
-    public build(callback?: (configResult: ConfigResult) => void): EngineConfig {
+    public build(callback?: (configResult: ConfigResult) => void): BuildConfig {
         computeOrDefault(callback, (safeCallback: (configResult: ConfigResult) => void) =>
             safeCallback({errors: this.errors, warnings: this.warnings, config: this.config }));
         return this.config;

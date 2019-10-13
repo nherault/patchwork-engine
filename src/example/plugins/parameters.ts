@@ -4,10 +4,10 @@ import { BasePluginServiceTypes } from './services';
 // PARAMETERS
 /////////////////////////////////
 export enum BasePluginParameterTypes {
-    PARAM_1 = '[basePlugin] PARAM_1',
-    PARAM_2 = '[basePlugin] PARAM_2',
-    PARAM_3 = '[basePlugin] PARAM_3',
-    PARAM_4 = '[basePlugin] PARAM_4',
+    PARAM_1 = '[basePlugin] PARAM_1]',
+    PARAM_2 = '[basePlugin] PARAM_2]',
+    PARAM_3 = '[basePlugin] PARAM_3]',
+    PARAM_4 = '[basePlugin] PARAM_4]',
 }
 
 export const parameters = {

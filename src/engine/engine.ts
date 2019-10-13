@@ -1,7 +1,10 @@
 import { logErr } from '../utils/utils';
 import { Action } from './action.type';
-import { EngineConfig, Hook, HookPosition, HookType, PatchworkConfigType } from './engine.type';
+import { BuildConfig, EngineConfig, PatchworkConfigType } from './engine.type';
 import { Getter } from './getter.type';
+import { Hook, HookPosition, HookType } from './hook.type';
+import { Services } from './service/service.type';
+import { ServiceInitializer } from './service/service-initializer';
 
 // TODO:
 // - Hotload plugin (reset Service, initService / initAction)
@@ -16,22 +19,18 @@ export class PatchworkEngine {
   private readonly getServiceBind: any;
   private readonly resetServicesBind: any;
 
-  constructor(config: any) {
-    this.config = config;
+  private readonly serviceInitializer: ServiceInitializer;
 
+  constructor(config: BuildConfig) {
     this.dispatchBind = this.dispatch.bind(this);
     this.getBind = this.get.bind(this);
     this.isExistBind = this.isExist.bind(this);
     this.getParameterBind = this.getParameter.bind(this);
     this.getServiceBind = this.getService.bind(this);
     this.resetServicesBind = this.resetServices.bind(this);
-  }
+    this.serviceInitializer = new ServiceInitializer();
 
-  public init(): PatchworkEngine {
-      this.initServices('services');
-      this.initActions();
-
-      return this;
+    this.config = this.init(config);
   }
 
   public dispatch(action: Action): void {
@@ -157,26 +156,45 @@ export class PatchworkEngine {
       hook.type === hookType && hook.position === hookPosition && (hook.name === undefined || hook.name === name));
   }
 
-  private initServices(type: string): void {
-      const initObj = this.config[type];
-      for (const key in initObj) {
-          if (initObj[key]) {
-            const currObj = initObj[key];
-            if (currObj.type) {
-              currObj.value = new currObj.type();
-            }
-            const objParameters = this.config.parameters[key];
-            if (currObj.factory) {
-              currObj.value = currObj.factory(currObj.config, objParameters);
-            }
-            if (currObj.init) {
-              currObj.init(currObj.value, currObj.config, objParameters);
-            }
-          }
-      }
+  private init(config: BuildConfig): EngineConfig {
+    const engineConfig = {
+      actions: config.actions,
+      getters: config.getters,
+      hooks: config.hooks,
+      parameters: config.parameters,
+      name: config.name,
+      version: config.version,
+      services: {},
+    };
+    this.config = engineConfig;
+    engineConfig.services = this.initServices(config);
+    this.initActions(config);
+    return engineConfig;
   }
 
-  private initActions(): void {
-    this.config.inits.forEach(actionInit => this.dispatch(actionInit));
+  private initServices(config: BuildConfig): Services {
+      const initObj = config.services;
+      const { errors, result: services } = this.serviceInitializer.createServices(config.services, config.parameters);
+      if (errors.length > 0) {
+        errors.forEach(error => logErr(`@PatchworkEngine::initServices: ${error}`));
+      } else {
+        for (const key in initObj) {
+          if (initObj[key]) {
+            const currObj = initObj[key];
+            const objParameters = config.parameters[key];
+            if (services[key]) {
+              services[key].reset = currObj.reset;
+              if (currObj.init) {
+                currObj.init(services[key], objParameters);
+              }
+            }
+          }
+        }
+      }
+      return services;
+  }
+
+  private initActions(config: BuildConfig): void {
+    config.inits.forEach(actionInit => this.dispatch(actionInit));
   }
 }

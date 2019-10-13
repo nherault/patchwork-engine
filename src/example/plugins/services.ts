@@ -4,8 +4,8 @@ export interface Entity {
 
 export class MyService {
     private entities: Entity[];
-    constructor() {
-        console.debug('constructor: MyService');
+    constructor(param: any) {
+        console.debug(`constructor: MyService with param: ${JSON.stringify(param)}`);
         this.entities = [];
     }
 
@@ -22,6 +22,12 @@ export class MyService {
     }
 }
 
+export class MyService2 {
+    constructor(param: any) {
+        console.debug(`constructor: MyService2 with param: ${JSON.stringify(param)}`);
+    }
+}
+
 /////////////////////////////////
 // SERVICES
 /////////////////////////////////
@@ -32,29 +38,53 @@ const initMyService = (serviceName: string, service: any, serviceConfig: any, se
 export enum BasePluginServiceTypes {
     MY_SERVICE_1 = '[basePlugin] MY_SERVICE_1',
     MY_SERVICE_2 = '[basePlugin] MY_SERVICE_2',
+    MY_SERVICE_3 = '[basePlugin] MY_SERVICE_3',
+    MY_SERVICE_4 = '[basePlugin] MY_SERVICE_4',
 }
 
 export const services = {
     [BasePluginServiceTypes.MY_SERVICE_1]: {
-        config: {
-            code: 'serviceCode1',
-            label: 'serviceLabel1',
-        },
-        init: (service: any, serviceConfig: any, serviceParam: any) => {
-            initMyService('Myservice1', service, serviceConfig, serviceParam);
+        init: (service: MyService, serviceParam: any) => {
+            initMyService('Myservice1', service, {
+                code: 'serviceCode1',
+                label: 'serviceLabel1',
+            }, serviceParam);
         },
         type: MyService,
+        deps: [{ parameter: '[basePlugin] PARAM_2]' }]
     },
     [BasePluginServiceTypes.MY_SERVICE_2]: {
-        config: {
-            code: 'serviceCode2',
-            label: 'serviceLabel2',
+        factory: (param: string) => {
+            return { value: new MyService(param) };
         },
-        factory: () => {
-            return new MyService();
+        init: (service: MyService, serviceParam: any) => {
+            initMyService('Myservice2', service, {
+                code: 'serviceCode2',
+                label: 'serviceLabel2',
+            }, serviceParam);
         },
-        init: (service: any, serviceConfig: any, serviceParam: any) => {
-            initMyService('Myservice2', service, serviceConfig, serviceParam);
+        deps: [{ parameter: '[basePlugin] PARAM_4]' }]
+    },
+    [BasePluginServiceTypes.MY_SERVICE_3]: {
+        init: (service: MyService2, serviceParam: any) => {
+            initMyService('Myservice2', service, {
+                code: 'serviceCode2',
+                label: 'serviceLabel2',
+            }, serviceParam);
         },
+        type: MyService2,
+        deps: ['[basePlugin] MY_SERVICE_1']
+    },
+    [BasePluginServiceTypes.MY_SERVICE_4]: {
+        factory: (param: string) => {
+            return { value: new MyService(param) };
+        },
+        init: (service: MyService, serviceParam: any) => {
+            initMyService('Myservice4', service, {
+                code: 'serviceCode4',
+                label: 'serviceLabel4',
+            }, serviceParam);
+        },
+        deps: [{ parameter: '[basePlugin] PARAM_3]' }]
     },
 };

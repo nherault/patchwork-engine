@@ -23,6 +23,5 @@ Required: Change signature
 Parameter:
 - Add getParameter with type (like getters)
 
-Service:
-- Dependencie injection?
-- Initialisation?
+Service
+- Check service name undefined in cycle

@@ -24,7 +24,6 @@ const initConfig = new ConfigBuilder()
 
 logDebug(initConfig);
 const patchworkEngine = new PatchworkEngine(initConfig);
-patchworkEngine.init();
 
 const { dispatch: dispatch } = baseActionInfo;
 const { gets: get } = baseGetterInfo;
